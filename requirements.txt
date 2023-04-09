@@ -1,0 +1,7 @@
+starlette==0.26.1
+pymongo~=4.3.3
+uvicorn==0.21.0
+Jinja2~=3.1.2
+motor==3.1.2
+twilio~=8.0.0
+argon2-cffi~=21.3.0

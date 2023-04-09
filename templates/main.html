@@ -1,0 +1,154 @@
+<html>
+    <head>
+        <script src="https://accounts.google.com/gsi/client"></script>
+        <link href="../static/main.css" rel="stylesheet"/>
+        <link href="../static/globals.css" rel="stylesheet"/>
+        <script src="../static/main.js"></script>
+        <script src="../static/globals.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&family=Source+Sans+Pro&display=swap" rel="stylesheet">
+        <title>Taskhopper</title>
+        <link rel="shortcut icon" href="../static/images/grasshopper.svg" class="logo">
+        <link rel="apple-touch-icon" href="../static/images/grasshopper.svg" class="logo">
+    </head>
+    <body>
+        <header>TaskHopper
+            <img id="logo" src="../static/images/grasshopper.svg" height="60" alt="Logo" style="margin-left: 10px;">
+            <div id="header-end">
+                <a class="dash" href="/dashboard">Dashboard</a>
+                <!--Change to redirect by javascript so if user isn't logged in it opens login instead of redirecting.-->
+                <button id="signup" class="header-button" onclick="openSignup()">
+                    Sign Up
+                </button>
+                <button id="login" class="header-button" onclick="openLogin()">
+                    Log In
+                </button>
+            </div>
+        </header>
+
+        <div id="blur" class="hidden"></div>
+        <div id="page">
+            <div id="page-right" class="side right">
+                <h1 id="slogan">
+                    Keep It In The <p>Neighborhood</p>
+                </h1>
+                <div id="descriptions">
+                    <div>
+                        <p class="title">Work</p>
+                        <p>
+                            Find odd jobs around the neighborhood to make money and help the community.
+                        </p>
+                    </div>
+                    <div>
+                        <b><p class="title">Hire</p></b>
+                        <p>
+                            Hire members of your community to do tasks, from mowing your lawn to painting your house.
+                        </p>
+                    </div>
+                    
+                </div>
+
+                
+            </div>
+            <div id="page-left" class="side left">
+                <img src="../static/images/homepage-photo.jpg">
+            </div>
+        </div>
+        <div id="signUpMenu" class="hidden">
+            <img src="../static/images/arrow-left.svg" onclick="closeSignup()">
+            <h1>Create your Profile</h1>
+            <div class="info-box">
+                <h3>Email address</h3>
+                <input type="email" name="email" id="email" placeholder="example@email.com">
+            </div>
+            <div class="info-box">
+                <h3>Password</h3>
+                <input type="password" name="password" id="password" placeholder="tAsKhOpPeR123!">
+            </div>
+            <div class="info-box">
+                <h3>Full Name</h3>
+                <input type="text" name="name" id="name" placeholder="Task Hopper">
+            </div>
+            <div class="info-box">
+                <h3>Date of Birth</h3>
+                <input type="date" name="birthday" id="birthday">
+            </div>
+            <div class="info-box">
+                <h3>Street Address</h3>
+                <input type="text" name="address" id="address" placeholder="123 Taskhopper Way">
+                <input type="text" name="city" id="city" placeholder="City">
+                <div>
+                    <input type="text" name="state" id="state" placeholder="State (CA)">
+                    <input type="text" name="zip" id="zip" placeholder="Zip Code">
+                </div>
+                
+            </div>
+            <button class="submit header-button" style="margin-top: 30px;" onclick="signup()">Sign Up</button>
+        </div>
+        <div id="loginMenu" class="hidden">
+            <img src="../static/images/arrow-left.svg" onclick="closeLogin()">
+            <h1>Log In</h1>
+            <div class="info-box">
+                <h3>Email address</h3>
+                <input type="email" name="email" id="email-login" placeholder="example@email.com">
+            </div>
+            <div class="info-box">
+                <h3>Password</h3>
+                <input type="password" name="password" id="password-login" placeholder="tAsKhOpPeR123!">
+            </div>
+            <button class="submit header-button" onclick="login()">Log In</button>
+        </div>
+    </body>
+    <script>
+        function googleLogIn(e) {
+            console.log('f')
+        }
+        window.addEventListener('load', () => {
+            google.accounts.id.initialize({
+                client_id: "1020485868980-6mht8tfsl1plt2i16g1ll3vu2iv33bog.apps.googleusercontent.com",
+                callback: googleLogIn});
+
+            google.accounts.id.renderButton(
+                document.getElementById("gsignin"),
+                { theme: "outline", size: "large"});
+            google.accounts.id.prompt();
+        })
+
+        async function signup() {
+            resp = await fetch('/signup', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'username': document.getElementById('email').value, 
+                    'password': document.getElementById('password').value,
+                    'name': document.getElementById('name').value,
+                    'dob': document.getElementById('birthday').value,
+                    'address': document.getElementById('address').value,
+                    'city': document.getElementById('city').value,
+                    'state': document.getElementById('state').value,
+                    'zip': document.getElementById('zip').value
+                })
+            }).then(x => x.json())
+            if (resp['error'] === '') {
+                location.assign(`/set_cookie?username=${resp['username']}&token=${resp['token']}`)
+            }
+        }
+
+        async function login() {
+            resp = await fetch('/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'username': document.getElementById('email-login').value, 
+                    'password': document.getElementById('password-login').value
+                })
+            }).then(x => x.json())
+            if (resp['error'] === '') {
+                location.assign(`/set_cookie?username=${resp['username']}&token=${resp['token']}`)
+            } else {
+                console.log(resp['error'])
+            }
+        }
+    </script>
+</html>

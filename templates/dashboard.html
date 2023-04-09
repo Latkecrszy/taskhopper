@@ -1,0 +1,183 @@
+<html>
+<head>
+  <script src="https://accounts.google.com/gsi/client"></script>
+  <link href="../static/dashboard.css" rel="stylesheet" />
+  <link href="../static/globals.css" rel="stylesheet" />
+  <script src="../static/main.js"></script>
+  <script src="../static/globals.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+  <script>
+    let username = '{{ username }}'
+    let view = '{{ view }}'
+  </script>
+</head>
+
+<body>
+  <header>
+    <p onclick="location.href = '/'" style=" cursor: pointer;">TaskHopper</p>
+    <img id="logo" src="../static/images/grasshopper.svg" height="60" alt="Logo" style="margin-left: 10px;" onclick="location.href = '/'">
+    <div id="header-end">
+        <button id="logout" class="header-button" onclick="logOut()">
+            Log Out
+        </button>
+        <button id="changeview" style="width: 140px" class="header-button" onclick="changeView()">
+            Switch View
+        </button>
+    </div>
+</header>
+<div id="blur" class="hidden"></div>
+<img id="check" src="../static/images/check.svg" height="300" width="300" alt="check">
+{% if view == 'work' %}
+<div class="container">
+    
+    <div class="job-listings">
+        <h2>Available Jobs in your area</h2>
+        <h3>─────────────────────</h3>
+        <div class="grid-container">
+            <div class="job-box">
+                <h3>Mow Lawn</h3>
+                <p>0.7 miles away</p>
+                <p>$25</p>
+                <button onclick="openPopup()">Additional Information</button>
+            </div>
+            <div class="job-box">
+                <h3>Paint House</h3>
+                <p>3.2 miles away</p>
+                <p>$55</p>
+                <button onclick="openPopup()">Additional Information</button>
+            </div>
+            <div class="job-box">
+                <h3>Walk Dog</h3>
+                <p>0.5 miles away</p>
+                <p>$35</p>
+                <button onclick="openPopup()">Additional Information</button>
+            </div>
+            <div class="job-box">
+                <h3>Clean House</h3>
+                <p>2.3 miles away</p>
+                <p>$40</p>
+                <button onclick="openPopup()">Additional Information</button>
+            </div>
+            <div class="job-box">
+                <h3>Vacuum</h3>
+                <p>1.8 miles away</p>
+                <p>$20</p>
+                <button onclick="openPopup()">Additional Information</button>
+            </div>
+            <div class="job-box">
+                <h3>Wash Windows</h3>
+                <p>1.2 miles away</p>
+                <p>$30</p>
+                <button onclick="openPopup()">Additional Information</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div class="container" style="width: 100%;">
+        <div class="create-job">
+            <h1>Create Job</h1>
+            <div class="value-box">
+                <h3>Job Name</h3>
+                <input type="text" name="job-name" id="job-name">
+            </div>
+            <div class="value-box">
+                <h3>Price</h3>
+                <input type="text" name="job-price" id="job-price">
+            </div>
+            <div class="value-box">
+                <h3>Days Available</h3>
+                <input type="text" name="job-days" id="job-days">
+            </div>
+            <div class="value-box">
+                <h3>Additional Info</h3>
+                <textarea name="job-info" id="job-info"></textarea>
+            </div>
+            <button id="create" class="header-button" onclick="changeView()">Create</button>
+        </div>
+    </div>
+{% endif %}
+    
+
+    <div class="popup" id="popup-box">
+      <h2>Additional Information</h2>
+      <p>─────────────────────</p>
+
+      <p><b>Lister name</b>: Jane Doe</p>
+      <p><b>Date of Birth</b>: May 18th, 1976</p>
+      <p><b>Address</b>: 1460 North Main Street, Walnut Creek CA</p>
+      <p>Pay: 25$</p>
+      <p>Time Frame: Wednesday</p>
+      <p>Additional Information: I used to love mowing my lawn, but since my husband was killed in a horrific lawnmower accident I 
+        can't bring myself to go near one.
+      </p>
+      <button onclick="closePopup()" style="background: var(--accent3)">Close</button> 
+            <button onclick="acceptOffer()">Accept</button>
+    </div>
+    
+
+    <script>
+      function openPopup() {
+        // Get the pop-up box element
+        document.getElementsByClassName("popup")[0].style.display = "block";
+        document.getElementById('popup-box').style.display = 'block';
+        // Set the display style to "block" to show the pop-up box
+        blur()
+      }
+
+    function blur() {
+        console.log('blurring')
+        document.getElementById('blur').classList.toggle('hidden')
+    }
+
+      function closePopup() {
+        // Get the pop-up box element
+        var popup = document.getElementById("popup-box");
+        // Set the display style to "none" to hide the pop-up box
+        popup.style.display = "none";
+        blur()
+      }
+
+    async function acceptOffer() {
+        console.log('qh')
+        document.getElementsByClassName('popup')[0].style.opacity = 0;
+        document.getElementById('check').style.display = 'block';
+        document.getElementById('check').style.opacity = 1;
+        await sleep(1500)
+        document.getElementById('check').style.opacity = 0;
+        blur()
+        document.getElementById('check').style.display = 'none';
+        document.getElementsByClassName("popup")[0].style.display = "none";
+        document.getElementsByClassName('popup')[0].style.opacity = 1;
+
+
+    }
+
+    async function logOut() {
+        document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        document.cookie = "session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        location.replace('/')
+    }
+
+    async function changeView() {
+        await fetch('/switch-view', {
+            'method': 'POST',
+            'body': JSON.stringify({'username': username})
+        })
+        location.reload()
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    document.getElementById('blur').addEventListener('click', () => {closePopup()})
+
+    </script>
+
+
+</body>
+
+</html>
